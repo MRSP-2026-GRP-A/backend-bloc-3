@@ -76,6 +76,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, security]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/add_github_actions')
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
