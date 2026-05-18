@@ -25,9 +25,18 @@ def _is_night(t: Optional[time]) -> bool:
 
 @router.get("", response_model=List[TripResponse])
 def get_all_trips(session: Session = Depends(get_session)):
-    trips = session.exec(select(Trip)).all()
-    return trips
-
+    trips = session.exec(
+        select(Trip, Agency)
+        .join(Agency, Trip.id_agency == Agency.id_agency)
+    ).all()
+    
+    result = []
+    for trip, agency in trips:
+        trip_dict = trip.model_dump()
+        trip_dict["agency_name"] = agency.name
+        result.append(trip_dict)
+    
+    return result
 
 # ---------------------------------------------------------------------------
 # GET /trajets/{id}
