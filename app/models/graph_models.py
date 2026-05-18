@@ -54,7 +54,7 @@ class TripResponse(BaseModel):
     duration: Optional[int]
     distance: Optional[int]
     emission: Optional[float]
-    id_agency: int
+    agency_name: str
 
     class Config:
         from_attributes = True
