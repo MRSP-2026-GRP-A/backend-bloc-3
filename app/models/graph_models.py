@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 
 # ---------------------------------------------------------------------------
-# Itin??raires (routes existantes)
+# Itinéraires (routes existantes)
 # ---------------------------------------------------------------------------
 
 class TripStep(BaseModel):
@@ -41,7 +41,7 @@ class RouteCompareResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Trajets ??? /trajets
+# Trajets — /trajets
 # ---------------------------------------------------------------------------
 
 class TripResponse(BaseModel):
@@ -61,7 +61,7 @@ class TripResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Trajet d??tail ??? /trajets/{id}
+# Trajet détail — /trajets/{id}
 # ---------------------------------------------------------------------------
 
 class AgencyResponse(BaseModel):
@@ -91,7 +91,7 @@ class TripDetailResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Stats ??? /trajets/stats/volumes
+# Stats — /trajets/stats/volumes
 # ---------------------------------------------------------------------------
 
 class StatsVolumesResponse(BaseModel):
@@ -103,7 +103,7 @@ class StatsVolumesResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# ML ??? /ml/predict
+# ML — /ml/predict
 # ---------------------------------------------------------------------------
 
 class PredictResponse(BaseModel):
