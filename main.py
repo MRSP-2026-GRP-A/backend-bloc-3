@@ -1,7 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from prometheus_fastapi_instrumentator import Instrumentator
-import joblib
+from prometheus_client import Counter
 import os
 
 from app.api.endpoints import graph, ml, trips
@@ -11,16 +11,20 @@ from app.services.graph_cache import GraphCache
 
 ml_models = {}
 
+REQUEST_COUNT = Counter(
+    "app_request_count",
+    "Nombre de requêtes par endpoint et status code",
+    ["method", "endpoint", "status_code"]
+)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Chargement du modèle ML
     model_path = "app/ml_assets/emission_model.joblib"
     if os.path.exists(model_path):
         print("Modèle ML chargé.")
     else:
-        print("Aucun modèle ML trouvé utilisez POST /ap/ml/train pour l'entraîner.")
+        print("Aucun modèle ML trouvé — utilisez POST /api/ml/train pour l'entraîner.")
 
-    # Construction du graphe NetworkX une seule fois
     session = next(get_session())
     try:
         G = build_graph(session)
@@ -38,15 +42,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Prometheus expose /metrics
-Instrumentator(
-    should_group_status_codes=False,  #garde les status codes séparés
-).instrument(app).expose(app)
+@app.middleware("http")
+async def count_requests(request: Request, call_next):
+    response = await call_next(request)
+    REQUEST_COUNT.labels(
+        method=request.method,
+        endpoint=request.url.path,
+        status_code=str(response.status_code)
+    ).inc()
+    return response
+
+Instrumentator().instrument(app).expose(app)
 
 app.include_router(trips.router, prefix="/api")
 app.include_router(graph.router, prefix="/api")
 app.include_router(ml.router, prefix="/api")
-
-@app.get("/")
-def root():
-    return {"status": "L'API est en ligne"}
